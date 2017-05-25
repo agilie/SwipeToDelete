@@ -35,7 +35,7 @@ class SwipeToDeleteAdapter<K, in V, H : ISwipeToDeleteHolder<K>>(private val ite
                 swipeToDeleteAdapter.notifyItemRemoved(position)
             } else {
                 holders[key] = holder
-                holder.isPendingDelete = modelOptions[key]!!.isPendingDelete
+                holder.direction = modelOptions[key]!!.direction ?: SwipeConstants.NO_SWIPE
 
                 if (modelOptions[key]!!.isPendingDelete) onBindPendingContact(holder, key, item, animatorListener, animationUpdateListener)
                 else onBindCommonContact(holder, key, item)

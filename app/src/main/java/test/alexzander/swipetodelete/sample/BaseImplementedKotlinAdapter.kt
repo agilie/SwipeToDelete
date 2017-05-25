@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.swipetodeletelib.SwipeConstants
 import com.example.swipetodeletelib.SwipeToDeleteAdapter
 import com.example.swipetodeletelib.interfaces.ISwipeToDeleteAdapter
 import com.example.swipetodeletelib.interfaces.ISwipeToDeleteHolder
@@ -41,7 +42,7 @@ class BaseImplementedKotlinAdapter(context: Context, var mutableList: MutableLis
         var userContainer = view.user_container
         var userName = view.user_name
 
-        override var isPendingDelete: Boolean = false
+        override var direction: Int = SwipeConstants.NO_SWIPE
 
         override val topContainer = userContainer!!
 

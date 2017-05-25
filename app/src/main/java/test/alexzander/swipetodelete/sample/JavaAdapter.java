@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
+import com.example.swipetodeletelib.SwipeConstants;
 import com.example.swipetodeletelib.SwipeToDeleteAdapter;
 import com.example.swipetodeletelib.interfaces.ISwipeToDeleteAdapter;
 import com.example.swipetodeletelib.interfaces.ISwipeToDeleteHolder;
@@ -105,8 +106,6 @@ public class JavaAdapter extends RecyclerView.Adapter implements ISwipeToDeleteA
 
         AppCompatTextView userName;
         FrameLayout undoContainer;
-
-        boolean isPendingDelete;
         String key;
 
         Holder(View view) {
@@ -118,20 +117,21 @@ public class JavaAdapter extends RecyclerView.Adapter implements ISwipeToDeleteA
             undoContainer = (FrameLayout) view.findViewById(R.id.user_undo_container);
         }
 
-        @Override
-        public boolean isPendingDelete() {
-            return isPendingDelete;
+        int direction = SwipeConstants.NO_SWIPE;
+
+        public void setDirection(int direction) {
+            this.direction = direction;
         }
 
         @Override
-        public void setPendingDelete(boolean b) {
-            isPendingDelete = b;
+        public int getDirection() {
+            return direction;
         }
 
         @NotNull
         @Override
         public View getTopContainer() {
-            if (isPendingDelete) {
+            if (direction == SwipeConstants.LEFT || direction == SwipeConstants.RIGHT) {
                 return undoContainer;
             } else {
                 return userContainer;

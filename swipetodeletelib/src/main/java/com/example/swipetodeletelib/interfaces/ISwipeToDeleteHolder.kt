@@ -3,15 +3,7 @@ package com.example.swipetodeletelib.interfaces
 import android.view.View
 
 interface ISwipeToDeleteHolder<K> {
-
-    var isPendingDelete: Boolean
-    /**
-     *  get() =
-     *  if (isPendingDelete!!) undoContainer
-     *  else itemContainer
-     *
-     */
     val topContainer: View
-
+    var direction: Int
     var key: K
 }
