@@ -15,5 +15,9 @@ interface ISwipeToDeleteAdapter<K, in V, in H> {
 
     fun onItemDeleted(item: V) {}
 
+    fun leftSwiped(holder: H)
+
+    fun rightSwiped(holder: H)
+
     fun removeItem(key: K)
 }

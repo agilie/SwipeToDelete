@@ -37,6 +37,12 @@ class BaseImplementedKotlinAdapter(context: Context, var mutableList: MutableLis
         swipeToDeleteAdapter.removeItem(key)
     }
 
+    override fun leftSwiped(holder: Holder) {
+    }
+
+    override fun rightSwiped(holder: Holder) {
+    }
+
     class Holder(view: View) : RecyclerView.ViewHolder(view), ISwipeToDeleteHolder<String> {
 
         var userContainer = view.user_container

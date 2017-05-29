@@ -4,10 +4,10 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.example.swipetodeletelib.ModelOptions
 import com.example.swipetodeletelib.SwipeConstants
 import com.example.swipetodeletelib.SwipeToDeleteAdapter
@@ -43,17 +43,17 @@ class FullKotlinAdapter(val context: Context, val mutableList: MutableList<User>
     }
 
     override fun onAnimationEnd(animation: Animator?, options: ModelOptions<*>) {
-//        swipeToDeleteAdapter.holders[options.key]?.undoProgressBar?.visibility = View.GONE
+        swipeToDeleteAdapter.holders[options.key]?.undoProgressBar?.visibility = View.GONE
     }
 
     override fun onAnimationUpdate(animation: ValueAnimator?, options: ModelOptions<*>) {
-//        val posX = animation?.animatedValue as Float
-//        swipeToDeleteAdapter.holders[options.key]?.undoProgressBar?.x = posX
-//        options.posX = posX
+        val posX = animation?.animatedValue as Float
+        swipeToDeleteAdapter.holders[options.key]?.undoProgressBar?.x = posX
+        options.posX = posX
     }
 
     override fun onAnimationStart(animation: Animator?, options: ModelOptions<*>) {
-//        swipeToDeleteAdapter.holders[options.key]?.undoProgressBar?.visibility = View.VISIBLE
+        swipeToDeleteAdapter.holders[options.key]?.undoProgressBar?.visibility = View.VISIBLE
     }
 
     override fun findItemPositionByKey(key: Int) = (0..mutableList.lastIndex).firstOrNull { mutableList[it].id == key } ?: -1
@@ -65,17 +65,34 @@ class FullKotlinAdapter(val context: Context, val mutableList: MutableList<User>
         else holder.itemContainer.setOnClickListener { mainActivityNavigation.navigateToJavaActivity() }
     }
 
+    override fun leftSwiped(holder: MyHolder) {
+        Log.d("swipeListener", "leftSwiped")
+    }
+
+    override fun rightSwiped(holder: MyHolder) {
+        Log.d("swipeListener", "rightSwiped")
+    }
+
     override fun onBindPendingItem(holder: MyHolder, key: Int, item: User) {
         if (holder.direction == SwipeConstants.LEFT) {
             holder.itemContainer.visibility = View.GONE
             holder.undoContainer.visibility = View.VISIBLE
             holder.undoProgressBar.visibility = View.VISIBLE
+            holder.sendContainer.visibility = View.GONE
             holder.undoText.text = "Undo Text $key"
             holder.undoButton.setOnClickListener { swipeToDeleteAdapter.onUndo(key) }
-        } else if (holder.direction == SwipeConstants.RIGHT){
+//            Log.d("testLog", "LEFT \n undo container ${holder.undoContainer.id}  ${holder.undoContainer.visibility}")
+//            Log.d("testLog", "item container ${holder.itemContainer.id}  ${holder.itemContainer.visibility}")
+//            Log.d("testLog", "send container ${holder.sendContainer.id}  ${holder.sendContainer.visibility}")
+        } else if (holder.direction == SwipeConstants.RIGHT) {
             holder.itemContainer.visibility = View.GONE
+            holder.undoContainer.visibility = View.GONE
             holder.sendContainer.visibility = View.VISIBLE
             holder.sendText.text = "SendText $key"
+            holder.sendButton.setOnClickListener { swipeToDeleteAdapter.onUndo(key) }
+//            Log.d("testLog", "RIGHT \n undo container ${holder.undoContainer.id}  ${holder.undoContainer.visibility}")
+//            Log.d("testLog", "item container ${holder.itemContainer.id}  ${holder.itemContainer.visibility}")
+//            Log.d("testLog", "send container ${holder.sendContainer.id}  ${holder.sendContainer.visibility}")
         }
     }
 

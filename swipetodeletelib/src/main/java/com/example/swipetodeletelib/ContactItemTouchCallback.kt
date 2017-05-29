@@ -6,7 +6,7 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import com.example.swipetodeletelib.interfaces.ISwipeToDeleteHolder
 import com.example.swipetodeletelib.interfaces.ItemSwipeListener
 
-class ContactItemTouchCallback<K>(private val listener: ItemSwipeListener<K>?) : ItemTouchHelper.Callback() {
+class ContactItemTouchCallback<H>(private val listener: ItemSwipeListener<H>?) : ItemTouchHelper.Callback() {
 
     private val swipeDirs = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.END or
             ItemTouchHelper.START
@@ -20,7 +20,7 @@ class ContactItemTouchCallback<K>(private val listener: ItemSwipeListener<K>?) :
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
-        listener?.onItemSwiped(viewHolder as ISwipeToDeleteHolder<K>, swipeDir)
+        listener?.onItemSwiped(viewHolder as H, swipeDir)
     }
 
     override fun clearView(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder) {

@@ -1,5 +1,5 @@
 package com.example.swipetodeletelib.interfaces
 
-interface ItemSwipeListener<K> {
-    fun onItemSwiped(viewHolder: ISwipeToDeleteHolder<K>, swipeDir: Int)
+interface ItemSwipeListener<H> {
+    fun onItemSwiped(viewHolder: H, swipeDir: Int)
 }

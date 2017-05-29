@@ -4,12 +4,13 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import com.example.swipetodeletelib.interfaces.*
 import java.lang.IndexOutOfBoundsException
 
 class SwipeToDeleteAdapter<K, in V, H : ISwipeToDeleteHolder<K>>(private val items: MutableList<V>,
-                                                                 val context: Context, val swipeToDeleteAdapter: ISwipeToDeleteAdapter<K, V, H>) : ItemSwipeListener<K>, IUndoClickListener<K> {
+                                                                 val context: Context, val swipeToDeleteAdapter: ISwipeToDeleteAdapter<K, V, H>) : ItemSwipeListener<H>, IUndoClickListener<K> {
     var deletingDuration: Long? = null
     val itemTouchCallBack = ContactItemTouchCallback(this)
     val handler = Handler(Looper.getMainLooper())
@@ -19,10 +20,21 @@ class SwipeToDeleteAdapter<K, in V, H : ISwipeToDeleteHolder<K>>(private val ite
     val holders = HashMap<K, H>()
     var animationUpdateListener: IAnimationUpdateListener? = null
     var animatorListener: IAnimatorListener? = null
+    var containers = HashMap<K, HashMap<Int, View>>()
 
     init {
         if (swipeToDeleteAdapter is IAnimatorListener) animatorListener = swipeToDeleteAdapter
         if (swipeToDeleteAdapter is IAnimationUpdateListener) animationUpdateListener = swipeToDeleteAdapter
+    }
+
+
+    fun addContainer(key: K, swipeDir: Int, view: View) { // TODO
+        if (!containers.containsKey(key)) {
+            val viewHash = HashMap<Int, View>()
+            viewHash.put(swipeDir, view)
+            containers.put(key, viewHash)
+        } else if (containers.containsKey(key) && containers[key]?.containsKey(swipeDir)!!) { }
+        else { containers[key]?.put(swipeDir, view) }
     }
 
     fun onBindViewHolder(holder: H, key: K, position: Int) {
@@ -45,20 +57,34 @@ class SwipeToDeleteAdapter<K, in V, H : ISwipeToDeleteHolder<K>>(private val ite
         }
     }
 
-    override fun onItemSwiped(viewHolder: ISwipeToDeleteHolder<K>, swipeDir: Int) {
+    override fun onItemSwiped(viewHolder: H, swipeDir: Int) {
         val key = viewHolder.key
+        modelOptions[key]?.isPendingDelete = true
+        modelOptions[key]?.setDirection(swipeDir)
+        swipeToDeleteAdapter.notifyItemChanged(swipeToDeleteAdapter.findItemPositionByKey(key))
+
+        if(modelOptions[key]?.direction == SwipeConstants.LEFT) leftSwiped(viewHolder = viewHolder)
+        else rightSwiped(viewHolder = viewHolder)
+    }
+
+    fun checkAndRemovePendingItem(viewHolder: ISwipeToDeleteHolder<K>, key: K) {
         if (modelOptions[key]?.isPendingDelete ?: false) removeItemByKey(key)
-        else {
-            modelOptions[key]?.isPendingDelete = true
-            modelOptions[key]?.setDirection(swipeDir)
-            swipeToDeleteAdapter.notifyItemChanged(swipeToDeleteAdapter.findItemPositionByKey(key))
-        }
+    }
+
+    fun leftSwiped(viewHolder: H) {
+        swipeToDeleteAdapter.leftSwiped(viewHolder)
+    }
+
+    fun rightSwiped(viewHolder: H) {
+        swipeToDeleteAdapter.rightSwiped(viewHolder)
     }
 
     override fun onUndo(key: K) {
         val position = swipeToDeleteAdapter.findItemPositionByKey(key)
         handler.removeCallbacks(pendingRemoveActions[key])
-        modelOptions[key]?.isPendingDelete = false
+        val modelOption = modelOptions[key]
+        modelOption?.isPendingDelete = false
+        modelOption?.direction = SwipeConstants.NO_SWIPE
         swipeToDeleteAdapter.notifyItemChanged(position)
         SwipeToDeleteAdapterUtils.clearAnimator(animatorsMap[key])
     }
@@ -80,6 +106,15 @@ class SwipeToDeleteAdapter<K, in V, H : ISwipeToDeleteHolder<K>>(private val ite
             animatorsMap.put(key, animator)
         }
         animator?.start()
+    }
+
+    fun setVisibility(holder: H, key: K) { // TODO
+        containers[key]?.get(holder.direction)?.visibility = View.VISIBLE
+        Log.d("testLog", "container visible ${containers[key]?.get(holder.direction)?.id} == ${containers[key]?.get(holder.direction)?.visibility} ")
+        containers[key]?.filter { it.key != holder.direction }?.forEach { t, u ->
+            Log.d("testLog", "$t == ${u.id}")
+            u.visibility = View.GONE
+        }
     }
 
     fun removeItemByKey(key: K) {
